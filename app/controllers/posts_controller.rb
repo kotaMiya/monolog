@@ -1,10 +1,15 @@
 class PostsController < ApplicationController
+
+  before_action :authenticate_user
+  before_action :check_correct_user, {only: [:edit, :update, :destroy]}
+
   def index
     @posts = Post.all.order(created_at: :desc)
   end
 
   def show
     @post = Post.find_by(id: params[:id])
+    @user = @post.user
   end
 
   def new
@@ -12,7 +17,8 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = Post.new(content: params[:content])
+    @post = Post.new(content: params[:content],
+                     user_id: @current_user.id)
     if @post.save
       flash[:notice] = "success"
       redirect_to('/posts/index')
@@ -30,7 +36,7 @@ class PostsController < ApplicationController
     @post.content = params[:content]
 
     if @post.save
-      flash[:notice] = "Edit was success"
+      flash[:notice] = "Editing was successful"
       redirect_to("/posts/index")
     else
       render("posts/edit")
@@ -42,5 +48,14 @@ class PostsController < ApplicationController
     @post.destroy
     flash[:notice] = "successfully deleted"
     redirect_to("/posts/index")
+  end
+
+  def check_correct_user
+    @post = Post.find_by(id: params[:id])
+
+    if @post.user_id != @current_user.id
+      flash[:notice] = "You are not allowed"
+      redirect_to("/posts/index")
+    end
   end
 end

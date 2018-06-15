@@ -11,18 +11,40 @@
   <body>
     <header>
       <div class="header-logo">
-        <%= link_to("monolog", "/") %>
+        <% if @current_user %>
+          <%= link_to("monolog", "/posts/index") %>
+        <% else %>
+          <%= link_to("monolog", "/") %>
+        <% end %>
       </div>
       <ul class="header-menus">
-        <li>
-          <%= link_to("About", "/about") %>
-        </li>
-        <li>
-          <%= link_to("Index", "/posts/index") %>
-        </li>
-        <li>
-          <%= link_to("Post", "/posts/new") %>
-        </li>
+        <% if session[:user_id] %>
+          <li>
+            <%= link_to(@current_user.name, "/users/#{@current_user.id}") %>
+          </li>
+          <li>
+            <%= link_to("Timeline", "/posts/index") %>
+          </li>
+          <li>
+            <%= link_to("Post", "/posts/new") %>
+          </li>
+          <li>
+            <%= link_to("List of Users", "/users/index") %>
+          </li>
+          <li>
+            <%= link_to("Logout", "/logout", {method: :post}) %>
+          </li>
+        <% else %>
+          <li>
+            <%= link_to("About", "/about") %>
+          </li>
+          <li>
+            <%= link_to("Signup", "/signup") %>
+          </li>
+          <li>
+            <%= link_to("Login", "/login") %>
+          </li>
+        <% end %>
       </ul>
     </header>
     <% if flash[:notice] %>
